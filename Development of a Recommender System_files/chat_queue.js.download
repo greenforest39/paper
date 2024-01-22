@@ -1,0 +1,103 @@
+certainly.chat_queue={timer:0,timeout:60,interval:null,dictionaries:{en:{chat_queue_message:"An agent will join soon",chat_queue_button:"Cancel",chat_queue_canceled:"You have left the chat queue"},es:{chat_queue_message:"Un agente se unir\xe1 pronto",chat_queue_button:"Cancelar",chat_queue_canceled:"Has salido de la cola de chat."},de:{chat_queue_message:"Ein Agent wird bald hinzukommen",chat_queue_button:"Absagen",chat_queue_canceled:"Sie haben die Chat-Warteschlange verlassen"},da:{chat_queue_message:"En agent tiltr\xe6der snart",chat_queue_button:"Afbestille",chat_queue_canceled:"Du har forladt chatk\xf8en"}}},certainly.chat_queue.refreshCurrentDictionary=function(){var e=navigator.language.slice(0,2);e in certainly.chat_queue.dictionaries?certainly.chat_queue.dictionaries.current=certainly.chat_queue.dictionaries[e]:certainly.chat_queue.dictionaries.current=certainly.chat_queue.dictionaries.en},certainly.chat_queue.refreshCurrentDictionary(),certainly.renderChatEvent=function(e){certainly.sendMessage({sender:"bot",message:[{type:"card",cards:[{title:"",text:e,is_shareable:!1,image_source_url:"",image_destination_url:"",buttons:[]}]}],webchatKey:"WEBCHAT_KEY"in certainly?certainly.WEBCHAT_KEY:"1"})},certainly.showChatQueue=function(e){if(certainly.chat_queue.refreshCurrentDictionary(),!certainly.WEBCHAT_KEY){var t=document.querySelector("chatbutton[id^='botxo-button']");if(null!=t){var a=t.id.split("botxo-button-")[1];void 0!=a&&(certainly.WEBCHAT_KEY=a)}}certainly.chat_queue.timeout=60,"string"==typeof e?certainly.chat_queue.timeout=parseInt(e):"number"==typeof e&&(certainly.chat_queue.timeout=e);var n=`
+    <div id="certainly-chat-queue" title="Chat queue">
+      <div id="certainly-chat-queue-message">${certainly.chat_queue.dictionaries.current.chat_queue_message}</div>
+      <div id="countdown-wrapper">
+        <div id="certainly-chat-queue-loader"></div>
+        <div id="certainly-chat-queue-countdown"></div>
+      </div>
+      <div id="certainly-chat-queue-cancel" title="Cancel">${certainly.chat_queue.dictionaries.current.chat_queue_button}</div>
+    </div>
+    <style>
+      div#certainly-chat-queue {
+        position: absolute;
+        bottom: 0;
+        box-sizing: border-box;
+        left: 0px;
+        width: 100%;
+        height: calc(100% - 46px);
+        padding: 20px;
+        padding-top: 60%;
+        text-align: center;
+        content: "";
+        color: ${window?.certainly_settings?.chatMessage?.bot?.buttons?.color?window?.certainly_settings?.chatMessage?.bot?.buttons?.color:"#331A70"};
+        background: linear-gradient(0deg, ${window?.certainly_settings?.background?window?.certainly_settings?.background:"#fff"} 50%, transparent);
+        z-index: 1;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        flex-direction: column;
+        transition: .2s ease all;
+        transform-origin: bottom;
+        transform: scaleY(0);
+        transform: scaleY(1);
+    }
+    #certainly-chat-queue-message {
+      margin: 20px auto;
+    }
+    #countdown-wrapper {
+      position: relative;
+      display: inherit;
+      align-items: center;
+      text-align: center;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto;
+    }
+    #certainly-chat-queue-countdown {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-content: center;
+      flex-direction: column;
+    }  
+
+    #certainly-chat-queue-loader {
+      border: 8px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 8px solid ${window?.certainly_settings?.chatMessage?.bot?.buttons?.color?window?.certainly_settings?.chatMessage?.bot?.buttons?.color:"#331A70"};
+      width: 60px;
+      height: 60px;
+      margin: 20px auto;
+      -webkit-animation: spin 2s linear infinite; /* Safari */
+      animation: spin 2s linear infinite;
+    }
+
+    #certainly-chat-queue-cancel {
+      cursor: pointer;
+      width: 100px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      padding: 10.5px 22.5px;
+      border-radius: 4px;
+      margin-top: 80px;
+      color: ${window?.certainly_settings?.chatMessage?.bot?.buttons?.color?window?.certainly_settings?.chatMessage?.bot?.buttons?.color:"#331A70"};
+      border: 1.5px solid ${window?.certainly_settings?.chatMessage?.bot?.buttons?.color?window?.certainly_settings?.chatMessage?.bot?.buttons?.color:"#331A70"};
+      background: ${window?.certainly_settings?.chatMessage?.bot?.buttons?.backgroundColor?window?.certainly_settings?.chatMessage?.bot?.buttons?.backgroundColor:"#fff"};
+      transition-duration: 250ms
+      transition-timing-function: ease-in-out,ease-in-out;
+      -webkit-transition-property: background,border;
+      -webkit-transition-timing-function: ease-in-out,ease-in-out;
+      -webkit-transition-duration: 250ms;
+    }
+
+    #certainly-chat-queue-cancel:hover {
+      background: ${window?.certainly_settings?.chatMessage?.bot?.buttons?.color?window?.certainly_settings?.chatMessage?.bot?.buttons?.color:"#D2C8F1"};
+      border-color: ${window?.certainly_settings?.chatMessage?.bot?.buttons?.color?window?.certainly_settings?.chatMessage?.bot?.buttons?.color:"#D2C8F1"};
+      color: ${window?.certainly_settings?.chatMessage?.bot?.buttons?.backgroundColor?window?.certainly_settings?.chatMessage?.bot?.buttons?.backgroundColor:"#331a70"};
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    </style>`;document.querySelector("#certainly-chat-queue")?document.querySelector("#certainly-chat-queue").style.transform="scaleY(1)":(document.querySelector(`#botxo-iframeContainer-${certainly.WEBCHAT_KEY?certainly.WEBCHAT_KEY:"1"}`).insertAdjacentHTML("afterbegin",n),document.querySelector("#certainly-chat-queue-cancel").addEventListener("click",function(){window.dispatchEvent(new CustomEvent("certainly",{detail:"queue_canceled"})),certainly.hideChatQueue(),certainly.renderChatEvent(certainly.chat_queue.dictionaries.current.chat_queue_canceled),certainly.sendMessage({sender:"user",message:"QUEUE_CANCELED",visible:!1,webchatKey:"WEBCHAT_KEY"in certainly?certainly.WEBCHAT_KEY:"1"})}));var i=certainly.chat_queue.timeout,r=String(Math.floor(i/60)).padStart(2,"0"),o=String(i-60*r).padStart(2,"0");document.querySelector("#certainly-chat-queue-countdown").innerHTML=`${r}:${o}`,certainly.chat_queue.interval=setInterval(function(){if(certainly.chat_queue.timer==certainly.chat_queue.timeout)window.dispatchEvent(new CustomEvent("certainly",{detail:"queue_timeout"})),certainly.hideChatQueue(),certainly.sendMessage({sender:"user",message:"QUEUE_TIMEOUT",visible:!1,webchatKey:"WEBCHAT_KEY"in certainly?certainly.WEBCHAT_KEY:"1"});else{certainly.chat_queue.timer+=1;var e=certainly.chat_queue.timeout-certainly.chat_queue.timer,t=String(Math.floor(e/60)).padStart(2,"0"),a=String(e-60*t).padStart(2,"0");document.querySelector("#certainly-chat-queue-countdown").innerHTML=`${t}:${a}`}},1e3)},certainly.hideChatQueue=function(){document.querySelector("#certainly-chat-queue")&&(document.querySelector("#certainly-chat-queue").style.transform="scaleY(0)",document.querySelector("#certainly-chat-queue-countdown").innerHTML=""),void 0!==certainly.chat_queue.interval&&(clearInterval(certainly.chat_queue.interval),certainly.chat_queue.interval=null,certainly.chat_queue.timer=0)},window.dispatchEvent(new CustomEvent("certainly",{detail:"chat_queue_extension_loaded"}));
